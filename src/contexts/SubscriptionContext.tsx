@@ -262,26 +262,51 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
       let pkg: any = null;
 
-      if (productType === 'weekly') {
-        pkg = currentOfferings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.WEEKLY)
-          || currentOfferings.current.availablePackages.find(p => p.product?.identifier === 'nnppd_weekly')
-          || currentOfferings.current.availablePackages.find(p => p.product?.identifier?.includes('weekly'));
-      } else if (productType === 'monthly') {
-        pkg = currentOfferings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.MONTHLY)
-          || currentOfferings.current.availablePackages.find(p => p.product?.identifier === 'npd_mo')
-          || currentOfferings.current.availablePackages.find(p => p.product?.identifier?.includes('npd_mo'));
-      } else if (productType === 'lifetime') {
-        pkg = currentOfferings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.LIFETIME)
-          || currentOfferings.current.availablePackages.find(p => p.product?.identifier === 'nnpd_lv')
-          || currentOfferings.current.availablePackages.find(p => p.product?.identifier?.includes('_lv'));
+      const packageTypeMap: Record<ProductType, PACKAGE_TYPE> = {
+        weekly: PACKAGE_TYPE.WEEKLY,
+        monthly: PACKAGE_TYPE.MONTHLY,
+        lifetime: PACKAGE_TYPE.LIFETIME,
+      };
+
+      const productIdMap: Record<ProductType, string> = {
+        weekly: 'nnppd_weekly',
+        monthly: 'npd_mo',
+        lifetime: 'nnpd_lv',
+      };
+
+      // Try finding by package type first, then by product identifier
+      pkg = currentOfferings.current.availablePackages.find(p => p.packageType === packageTypeMap[productType])
+        || currentOfferings.current.availablePackages.find(p => p.product?.identifier === productIdMap[productType])
+        || currentOfferings.current.availablePackages.find(p => p.product?.identifier?.includes(productIdMap[productType]));
+
+      if (pkg) {
+        console.log('RevenueCat: Found package:', pkg.identifier, pkg.product?.identifier);
+        return await purchasePackage(pkg);
       }
 
-      if (!pkg) {
-        console.error('RevenueCat: Package not found. Available:', JSON.stringify(currentOfferings.current.availablePackages));
-        throw new Error(`Package not found for ${productType}`);
+      // Fallback: purchase directly via store product if not in offerings
+      console.log('RevenueCat: Package not found in offerings, trying direct product purchase for:', productIdMap[productType]);
+      const fullProductId = PRODUCT_IDS[productType];
+      const { products } = await Purchases.getProducts({ 
+        productIdentifiers: [productIdMap[productType], fullProductId] 
+      });
+      console.log('RevenueCat: Found store products:', products.map(p => p.identifier));
+
+      const storeProduct = products.find(p => p.identifier === productIdMap[productType])
+        || products.find(p => p.identifier === fullProductId)
+        || products[0];
+
+      if (!storeProduct) {
+        console.error('RevenueCat: No product found. Tried:', productIdMap[productType], fullProductId);
+        throw new Error(`Product not found for ${productType}. Make sure it's added to RevenueCat and Google Play.`);
       }
-      console.log('RevenueCat: Found package:', pkg.identifier, pkg.product?.identifier);
-      return await purchasePackage(pkg);
+
+      console.log('RevenueCat: Purchasing store product directly:', storeProduct.identifier);
+      const result = await Purchases.purchaseStoreProduct({ product: storeProduct });
+      setCustomerInfo(result.customerInfo);
+      const hasEntitlement = result.customerInfo.entitlements.active[ENTITLEMENT_ID] !== undefined;
+      setRcIsPro(hasEntitlement);
+      return hasEntitlement;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Purchase failed';
       console.error('RevenueCat: Purchase error', err);
