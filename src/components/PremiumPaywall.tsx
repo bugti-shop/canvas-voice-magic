@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Crown, Unlock, Bell, Loader2, MapPin } from 'lucide-react';
-import { useSubscription } from '@/contexts/SubscriptionContext';
+import { X, Crown, Unlock, Bell, Loader2, MapPin, Check } from 'lucide-react';
+import { useSubscription, ProductType } from '@/contexts/SubscriptionContext';
 import { Capacitor } from '@capacitor/core';
 import { triggerHaptic } from '@/utils/haptics';
 import { useHardwareBackButton } from '@/hooks/useHardwareBackButton';
 
+const PLANS = [
+  { id: 'weekly' as ProductType, label: 'Weekly', price: '$1.99/wk', badge: null },
+  { id: 'monthly' as ProductType, label: 'Monthly', price: '$5.99/mo', badge: 'Popular' },
+  { id: 'lifetime' as ProductType, label: 'Lifetime', price: '$29.99', badge: 'Best Value' },
+] as const;
+
 export const PremiumPaywall = () => {
   const { t } = useTranslation();
   const { showPaywall, closePaywall, unlockPro, purchase } = useSubscription();
+  const [selectedPlan, setSelectedPlan] = useState<ProductType>('monthly');
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [adminCode, setAdminCode] = useState('');
@@ -23,14 +30,14 @@ export const PremiumPaywall = () => {
 
   if (!showPaywall) return null;
 
-  const monthlyPrice = '$5.99/mo';
+  const currentPlan = PLANS.find(p => p.id === selectedPlan)!;
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
     setAdminError('');
     try {
       if (Capacitor.isNativePlatform()) {
-        const success = await purchase('monthly');
+        const success = await purchase(selectedPlan);
         if (success) {
           closePaywall();
         } else {
@@ -143,13 +150,33 @@ export const PremiumPaywall = () => {
            </div>
         </div>
 
-        {/* Monthly plan only */}
+        {/* Plan selection */}
         <div className="mt-10 flex flex-col items-center gap-4">
-          <div className="flex justify-center w-full">
-            <div className="border-2 border-primary bg-secondary rounded-xl p-4 w-64 text-center">
-              <p className="font-bold text-lg">{t('onboarding.paywall.monthly')}</p>
-              <p className="text-muted-foreground text-sm mt-1">{monthlyPrice}</p>
-            </div>
+          <div className="flex gap-3 w-full max-w-sm">
+            {PLANS.map((plan) => (
+              <button
+                key={plan.id}
+                onClick={() => setSelectedPlan(plan.id)}
+                className={`flex-1 relative rounded-xl p-3 text-center border-2 transition-all ${
+                  selectedPlan === plan.id 
+                    ? 'border-primary bg-secondary' 
+                    : 'border-muted bg-white'
+                }`}
+              >
+                {plan.badge && (
+                  <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-primary text-primary-foreground px-2 py-0.5 rounded-full whitespace-nowrap">
+                    {plan.badge}
+                  </span>
+                )}
+                <p className="font-bold text-sm">{plan.label}</p>
+                <p className="text-muted-foreground text-xs mt-1">{plan.price}</p>
+                {selectedPlan === plan.id && (
+                  <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                    <Check size={10} className="text-primary-foreground" />
+                  </div>
+                )}
+              </button>
+            ))}
           </div>
 
           <div className="flex flex-col items-center gap-2">
@@ -158,7 +185,7 @@ export const PremiumPaywall = () => {
               disabled={isPurchasing}
               className="w-80 mt-4 btn-duo disabled:opacity-50"
             >
-              {isPurchasing ? t('onboarding.paywall.processing') : t('onboarding.paywall.continueWithMonthly', { price: monthlyPrice })}
+              {isPurchasing ? t('onboarding.paywall.processing') : `Continue with ${currentPlan.label} — ${currentPlan.price}`}
             </button>
 
             <button 
