@@ -24,12 +24,12 @@ const ENTITLEMENT_ID = 'npd Pro';
 const PRODUCT_IDS = {
   weekly: 'nnppd_weekly:nnnpd-weekly',
   monthly: 'npd_mo:npd-mo',
-  lifetime: 'nnpd_lv',
+  yearly: 'npd_yr:npd-yearly-plan',
 } as const;
 
 export type ProductType = keyof typeof PRODUCT_IDS;
 export type SubscriptionTier = 'free' | 'premium';
-export type SubscriptionPlanType = 'none' | 'weekly' | 'monthly' | 'lifetime';
+export type SubscriptionPlanType = 'none' | 'weekly' | 'monthly' | 'yearly';
 
 // All premium features list
 export const PREMIUM_FEATURES = [
@@ -61,10 +61,8 @@ export const PREMIUM_FEATURES = [
   'customize_navigation',
 ] as const;
 
-// Features that require a recurring (monthly) subscription
-export const RECURRING_ONLY_FEATURES: readonly PremiumFeature[] = [
-  'location_reminders',
-] as const;
+// No features are restricted to specific plan types - all premium features available to all plans
+export const RECURRING_ONLY_FEATURES: readonly PremiumFeature[] = [] as const;
 
 export type PremiumFeature = typeof PREMIUM_FEATURES[number];
 
@@ -283,13 +281,13 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       const packageTypeMap: Record<ProductType, PACKAGE_TYPE> = {
         weekly: PACKAGE_TYPE.WEEKLY,
         monthly: PACKAGE_TYPE.MONTHLY,
-        lifetime: PACKAGE_TYPE.LIFETIME,
+        yearly: PACKAGE_TYPE.ANNUAL,
       };
 
       const productIdMap: Record<ProductType, string> = {
         weekly: 'nnppd_weekly',
         monthly: 'npd_mo',
-        lifetime: 'nnpd_lv',
+        yearly: 'npd_yr',
       };
 
       // Try finding by package type first, then by product identifier across ALL offerings
@@ -480,13 +478,13 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
     const entitlement = customerInfo.entitlements.active[ENTITLEMENT_ID];
     if (!entitlement) return 'none';
     const productId = entitlement.productIdentifier || '';
-    if (productId.includes('_lv') || productId.includes('lifetime')) return 'lifetime';
+    if (productId.includes('_yr') || productId.includes('yearly') || productId.includes('annual')) return 'yearly';
     if (productId.includes('weekly') || productId.includes('_wk')) return 'weekly';
     if (productId === PRODUCT_IDS.monthly || productId.includes('month') || productId.includes('mo')) return 'monthly';
     return 'none';
   }, [isPro, customerInfo, localProAccess]);
 
-  const isRecurringSubscriber = planType === 'monthly' || planType === 'weekly' || planType === 'lifetime';
+  const isRecurringSubscriber = planType === 'monthly' || planType === 'weekly' || planType === 'yearly';
 
   // ==================== Feature Gating ====================
 

@@ -15,9 +15,9 @@ export const BILLING_CONFIG = {
     productId: 'npd_mo:npd-mo',
     basePlanId: 'npd-mo',
   },
-  lifetime: {
-    productId: 'nnpd_lv',
-    purchaseOptionId: 'nnppd-lv',
+  yearly: {
+    productId: 'npd_yr:npd-yearly-plan',
+    basePlanId: 'npd-yearly-plan',
   },
 } as const;
 
@@ -45,10 +45,10 @@ export const PRICING_DISPLAY = {
     period: 'month',
     displayPrice: '$5.99/mo',
   },
-  lifetime: {
-    price: '$29.99',
-    period: 'once',
-    displayPrice: '$29.99',
+  yearly: {
+    price: '$39.99',
+    period: 'year',
+    displayPrice: '$39.99/yr',
   },
 } as const;
 
