@@ -50,12 +50,6 @@ This guide provides complete Android native code including:
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     
-    <!-- Storage -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     
     <!-- Biometric (for app lock) -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
@@ -205,6 +199,28 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
 
 > **No notification code in MainActivity!** The `@capacitor/local-notifications` plugin 
 > creates channels, handles permissions, and schedules notifications — all from JavaScript.
+
+---
+
+## Splash Screen Background Color
+
+In your `android/app/src/main/res/values/styles.xml`, add the window background color to your launch theme:
+
+```xml
+<item name="android:windowBackground">#3a6cc9</item>
+```
+
+---
+
+## Billing Dependency
+
+Add the Google Play Billing library to your `android/app/build.gradle`:
+
+```gradle
+dependencies {
+    implementation "com.android.billingclient:billing:7.1.1"
+}
+```
 
 ---
 
@@ -637,11 +653,6 @@ npx cap run android
 | `RECORD_AUDIO` | Voice notes & voice recording |
 | `MODIFY_AUDIO_SETTINGS` | Audio settings for recording |
 | `CAMERA` | Photo capture & scanning |
-| `READ_EXTERNAL_STORAGE` | Read files (Android 12 and below) |
-| `WRITE_EXTERNAL_STORAGE` | Write files (Android 9 and below) |
-| `READ_MEDIA_IMAGES` | Access images (Android 13+) |
-| `READ_MEDIA_AUDIO` | Access audio files (Android 13+) |
-| `READ_MEDIA_VIDEO` | Access video files (Android 13+) |
 | `USE_BIOMETRIC` | Fingerprint/face unlock for app lock |
 | `USE_FINGERPRINT` | Fingerprint authentication (legacy) |
 | `AD_ID` | Google Advertising ID for analytics & ads |
