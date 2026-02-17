@@ -59,7 +59,7 @@ export default function OnboardingFlow({
   const [progress, setProgress] = useState(0);
   const [complete, setComplete] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [plan, setPlan] = useState<'weekly' | 'monthly' | 'lifetime'>('weekly');
+  // Only monthly plan available
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [adminCode, setAdminCode] = useState('');
@@ -389,36 +389,13 @@ export default function OnboardingFlow({
   }
 
   if (showPaywall) {
-    // Helper to get package pricing from offerings
-    const getMonthlyPackage = () => {
-      if (!offerings?.current) return null;
-      return offerings.current.availablePackages.find(
-        (p: any) => p.packageType === 'MONTHLY' || p.identifier === 'monthly'
-      );
-    };
-    
-    const getLifetimePackage = () => {
-      if (!offerings?.current) return null;
-      return offerings.current.availablePackages.find(
-        (p: any) => p.packageType === 'LIFETIME' || p.identifier === 'lifetime'
-      );
-    };
-    
-    const monthlyPkg = getMonthlyPackage();
-    const lifetimePkg = getLifetimePackage();
-    
-    // Hardcoded USD prices for display
-    const weeklyPrice = '$2.99/wk';
     const monthlyPrice = '$5.99/mo';
-    const lifetimePrice = '$79.99';
-    const weeklyTrialDays = 1;
 
     return (
       <div className="min-h-screen bg-white p-6 flex flex-col justify-between" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 24px)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
         <div>
-          <h1 className="text-3xl font-bold text-center mb-6">{plan === 'lifetime' ? 'Unlock Pro Forever' : t('onboarding.paywall.startTrial', { days: weeklyTrialDays })}</h1>
+          <h1 className="text-3xl font-bold text-center mb-6">{t('onboarding.paywall.upgradeTitle')}</h1>
           <div className="flex flex-col items-start mx-auto w-80 relative">
-            {/* Vertical connecting line */}
             <div className="absolute left-[10.5px] top-[20px] bottom-[20px] w-[11px] bg-primary/20 rounded-b-full"></div>
 
             <div className="flex items-start gap-3 mb-6 relative">
@@ -427,7 +404,7 @@ export default function OnboardingFlow({
               </div>
               <div>
                 <p className="font-semibold">{t('onboarding.paywall.today')}</p>
-                <p className="text-gray-500 text-sm">{t('onboarding.paywall.todayDesc')}</p>
+                <p className="text-muted-foreground text-sm">{t('onboarding.paywall.todayDesc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3 mb-6 relative">
@@ -435,8 +412,8 @@ export default function OnboardingFlow({
                 <Bell size={16} className="text-primary-foreground" strokeWidth={2} />
               </div>
               <div>
-                <p className="font-semibold">{t('onboarding.paywall.reminderDay', { days: (weeklyTrialDays) - 1 })}</p>
-                <p className="text-gray-500 text-sm">{t('onboarding.paywall.reminderDesc')}</p>
+                <p className="font-semibold">{t('onboarding.paywall.reminderDay', { days: 2 })}</p>
+                <p className="text-muted-foreground text-sm">{t('onboarding.paywall.reminderDesc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3 relative">
@@ -444,8 +421,8 @@ export default function OnboardingFlow({
                 <Crown size={16} className="text-primary-foreground" strokeWidth={2} />
               </div>
               <div>
-                <p className="font-semibold">{t('onboarding.paywall.billingDay', { days: weeklyTrialDays })}</p>
-                <p className="text-gray-500 text-sm">{t('onboarding.paywall.billingDesc', { days: weeklyTrialDays })}</p>
+                <p className="font-semibold">{t('onboarding.paywall.billingDay', { days: 3 })}</p>
+                <p className="text-muted-foreground text-sm">{t('onboarding.paywall.billingDesc', { days: 3 })}</p>
               </div>
             </div>
           </div>
@@ -454,80 +431,47 @@ export default function OnboardingFlow({
           {isLoadingOfferings ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              <span className="ml-2 text-gray-500">{t('onboarding.paywall.loadingPrices')}</span>
+              <span className="ml-2 text-muted-foreground">{t('onboarding.paywall.loadingPrices')}</span>
             </div>
           ) : (
-            <div className="flex gap-2 justify-center w-full">
-              {/* Weekly Option - No free trial */}
-              <button onClick={() => { triggerHaptic('heavy'); setPlan('weekly'); }} className={`border-2 rounded-xl p-3 flex-1 text-center relative flex flex-col items-center justify-center min-h-[70px] ${plan === 'weekly' ? 'border-primary' : 'border-border'}`}>
-                <p className="font-bold text-sm">{t('onboarding.paywall.weekly', 'Weekly')}</p>
-                <p className="text-muted-foreground text-xs mt-0.5">{weeklyPrice}</p>
-              </button>
-
-              {/* Monthly Option */}
-              <button onClick={() => { triggerHaptic('heavy'); setPlan('monthly'); }} className={`border-2 rounded-xl p-3 flex-1 text-center relative flex flex-col items-center justify-center min-h-[70px] ${plan === 'monthly' ? 'border-primary bg-secondary' : 'border-border'}`}>
-                <span className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full absolute left-1/2 -translate-x-1/2 -top-2.5 whitespace-nowrap font-medium">
+            <div className="flex justify-center w-full">
+              <div className="border-2 border-primary bg-secondary rounded-xl p-4 w-64 text-center">
+                <span className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-medium">
                   3 DAYS FREE
                 </span>
-                <p className="font-bold text-sm">{t('onboarding.paywall.monthly')}</p>
-                <p className="text-muted-foreground text-xs mt-0.5">{monthlyPrice}</p>
-              </button>
-
-              {/* Lifetime Option */}
-              <button onClick={() => { triggerHaptic('heavy'); setPlan('lifetime'); }} className={`border-2 rounded-xl p-3 flex-1 text-center relative flex flex-col items-center justify-center min-h-[70px] ${plan === 'lifetime' ? 'border-primary' : 'border-border'}`}>
-                <span className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full absolute left-1/2 -translate-x-1/2 -top-2.5 whitespace-nowrap font-medium">
-                  BEST VALUE
-                </span>
-                <p className="font-bold text-sm">Lifetime</p>
-                <p className="text-gray-600 text-xs mt-0.5">{lifetimePrice}</p>
-              </button>
+                <p className="font-bold text-lg mt-2">{t('onboarding.paywall.monthly')}</p>
+                <p className="text-muted-foreground text-sm mt-1">{monthlyPrice}</p>
+              </div>
             </div>
           )}
 
             <div className="flex flex-col items-center gap-2">
-              {plan === 'lifetime' && !isLoadingOfferings && (
-                <p className="text-gray-500 text-xs mt-2 text-center max-w-xs">
-                  One-time payment. Does not include Location Based Reminders or future API features.
-                </p>
-              )}
-
               <button 
                 onClick={async () => {
                   setIsPurchasing(true);
                   try {
-                    // On native platforms, use RevenueCat purchase directly
                     if (Capacitor.isNativePlatform()) {
                       const { Purchases, PACKAGE_TYPE } = await import('@revenuecat/purchases-capacitor');
-                      
-                      // Get current offerings
                       const offerings = await Purchases.getOfferings();
                       
                       if (!offerings?.current) {
                         throw new Error(t('onboarding.paywall.noOfferings'));
                       }
                       
-                      // Find the package based on selected plan
-                      const packageType = plan === 'monthly' 
-                        ? PACKAGE_TYPE.MONTHLY 
-                        : plan === 'weekly' 
-                          ? PACKAGE_TYPE.WEEKLY 
-                          : PACKAGE_TYPE.LIFETIME;
                       let pkg = offerings.current.availablePackages.find(
-                        p => p.packageType === packageType
+                        p => p.packageType === PACKAGE_TYPE.MONTHLY
                       );
                       
-                      // Fallback to identifier if package type not found
                       if (!pkg) {
                         pkg = offerings.current.availablePackages.find(
-                          p => p.identifier === plan
+                          p => p.identifier === 'monthly'
                         );
                       }
                       
                       if (!pkg) {
-                        throw new Error(t('onboarding.paywall.packageNotFound', { plan }));
+                        throw new Error(t('onboarding.paywall.packageNotFound', { plan: 'monthly' }));
                       }
                       
-                      // Purchase the package
                       const result = await Purchases.purchasePackage({ aPackage: pkg });
                       const hasEntitlement = result.customerInfo.entitlements.active['npd Pro'] !== undefined;
                       
@@ -537,13 +481,11 @@ export default function OnboardingFlow({
                         onComplete();
                       }
                     } else {
-                      // Web fallback - just complete for testing
                       const { setSetting } = await import('@/utils/settingsStorage');
                       await setSetting('npd_trial_start', new Date().toISOString());
                       onComplete();
                     }
                   } catch (error: any) {
-                    // Check if user cancelled
                     if (error.code === 'PURCHASE_CANCELLED' || error.userCancelled) {
                       console.log('Purchase cancelled by user');
                     } else {
@@ -558,13 +500,7 @@ export default function OnboardingFlow({
                 disabled={isPurchasing}
                 className="w-80 mt-4 btn-duo disabled:opacity-50"
               >
-                {isPurchasing ? t('onboarding.paywall.processing') : (
-                  plan === 'weekly' 
-                    ? t('onboarding.paywall.continueWithPrice', { price: '$2.99' })
-                    : plan === 'monthly' 
-                      ? 'Start My 3 Days Free Trial' 
-                      : `Get Lifetime for ${lifetimePrice}`
-                )}
+                {isPurchasing ? t('onboarding.paywall.processing') : 'Start My 3 Days Free Trial'}
               </button>
 
               {/* Restore Purchase Button */}
