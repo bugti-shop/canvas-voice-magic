@@ -253,6 +253,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       const currentOfferings = await Purchases.getOfferings();
       if (!currentOfferings?.current) throw new Error('No offerings available');
 
+      // Debug: log all available packages so we can see what RevenueCat returns
+      console.log('RevenueCat: Available packages:', currentOfferings.current.availablePackages.map(p => ({
+        identifier: p.identifier,
+        packageType: p.packageType,
+        productIdentifier: p.product?.identifier,
+      })));
+      console.log('RevenueCat: Looking for productType:', productType, 'with ID:', PRODUCT_IDS[productType]);
+
       let packageType;
       if (productType === 'weekly') packageType = PACKAGE_TYPE.WEEKLY;
       else if (productType === 'monthly') packageType = PACKAGE_TYPE.MONTHLY;
@@ -260,10 +268,17 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
 
       // Try matching by package type first, then by product identifier, then by RC identifier
       const pkg = currentOfferings.current.availablePackages.find(p => p.packageType === packageType)
-        || currentOfferings.current.availablePackages.find(p => p.product.identifier === PRODUCT_IDS[productType])
+        || currentOfferings.current.availablePackages.find(p => p.product?.identifier === PRODUCT_IDS[productType])
         || currentOfferings.current.availablePackages.find(p => p.identifier === PRODUCT_IDS[productType])
-        || currentOfferings.current.availablePackages.find(p => p.identifier === `$rc_${productType}`);
-      if (!pkg) throw new Error(`Package not found for ${productType}`);
+        || currentOfferings.current.availablePackages.find(p => p.identifier === `$rc_${productType}`)
+        // Fallback: match by partial product identifier
+        || currentOfferings.current.availablePackages.find(p => p.product?.identifier?.startsWith(productType === 'lifetime' ? 'npd_lv' : productType === 'weekly' ? 'npd_wk' : 'npd_mo'));
+      
+      if (!pkg) {
+        console.error('RevenueCat: Package not found. Available:', JSON.stringify(currentOfferings.current.availablePackages));
+        throw new Error(`Package not found for ${productType}`);
+      }
+      console.log('RevenueCat: Found package:', pkg.identifier, pkg.product?.identifier);
       return await purchasePackage(pkg);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Purchase failed';

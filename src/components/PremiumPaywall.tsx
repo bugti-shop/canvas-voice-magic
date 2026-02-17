@@ -31,13 +31,16 @@ export const PremiumPaywall = () => {
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
+    setAdminError('');
     try {
       if (Capacitor.isNativePlatform()) {
         const success = await purchase(plan);
         if (success) {
           closePaywall();
         } else {
-          // purchase() returns false on cancel or failure
+          // purchase() returns false on cancel or failure - show feedback
+          setAdminError('Purchase was cancelled or failed. Please try again.');
+          setTimeout(() => setAdminError(''), 4000);
         }
       } else {
         // Web fallback
@@ -46,8 +49,8 @@ export const PremiumPaywall = () => {
     } catch (error: any) {
       if (error.code !== 'PURCHASE_CANCELLED' && !error.userCancelled) {
         console.error('Purchase failed:', error);
-        setAdminError('Purchase failed. Please try again.');
-        setTimeout(() => setAdminError(''), 3000);
+        setAdminError(`Purchase failed: ${error.message || 'Please try again.'}`);
+        setTimeout(() => setAdminError(''), 5000);
       }
     } finally {
       setIsPurchasing(false);
