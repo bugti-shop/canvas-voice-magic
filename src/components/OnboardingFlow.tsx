@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Confetti from 'react-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, CheckSquare, Unlock, Bell, Crown, Loader2 } from 'lucide-react';
+import { FileText, CheckSquare, Unlock, Bell, Crown, Loader2, Check } from 'lucide-react';
 // Google auth removed
 import Welcome from '@/components/Welcome';
 import featureHome from '@/assets/feature-home.png';
@@ -59,7 +59,7 @@ export default function OnboardingFlow({
   const [progress, setProgress] = useState(0);
   const [complete, setComplete] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
-  // Only monthly plan available
+  const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'lifetime'>('monthly');
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [adminCode, setAdminCode] = useState('');
@@ -389,7 +389,12 @@ export default function OnboardingFlow({
   }
 
   if (showPaywall) {
-    const monthlyPrice = '$5.99/mo';
+    const PLANS = [
+      { id: 'weekly' as const, label: 'Weekly', price: '$1.99/wk', badge: null },
+      { id: 'monthly' as const, label: 'Monthly', price: '$5.99/mo', badge: '3 DAYS FREE' },
+      { id: 'lifetime' as const, label: 'Lifetime', price: '$29.99', badge: 'Best Value' },
+    ];
+    const currentPlan = PLANS.find(p => p.id === selectedPlan)!;
 
     return (
       <div className="min-h-screen bg-white p-6 flex flex-col justify-between" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 24px)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
@@ -434,14 +439,31 @@ export default function OnboardingFlow({
               <span className="ml-2 text-muted-foreground">{t('onboarding.paywall.loadingPrices')}</span>
             </div>
           ) : (
-            <div className="flex justify-center w-full">
-              <div className="border-2 border-primary bg-secondary rounded-xl p-4 w-64 text-center">
-                <span className="bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full font-medium">
-                  3 DAYS FREE
-                </span>
-                <p className="font-bold text-lg mt-2">{t('onboarding.paywall.monthly')}</p>
-                <p className="text-muted-foreground text-sm mt-1">{monthlyPrice}</p>
-              </div>
+            <div className="flex gap-3 w-full max-w-sm">
+              {PLANS.map((plan) => (
+                <button
+                  key={plan.id}
+                  onClick={() => setSelectedPlan(plan.id)}
+                  className={`flex-1 relative rounded-xl p-3 text-center border-2 transition-all ${
+                    selectedPlan === plan.id 
+                      ? 'border-primary bg-secondary' 
+                      : 'border-muted bg-white'
+                  }`}
+                >
+                  {plan.badge && (
+                    <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-bold bg-primary text-primary-foreground px-2 py-0.5 rounded-full whitespace-nowrap">
+                      {plan.badge}
+                    </span>
+                  )}
+                  <p className="font-bold text-sm">{plan.label}</p>
+                  <p className="text-muted-foreground text-xs mt-1">{plan.price}</p>
+                  {selectedPlan === plan.id && (
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                      <Check size={10} className="text-primary-foreground" />
+                    </div>
+                  )}
+                </button>
+              ))}
             </div>
           )}
 
@@ -457,19 +479,32 @@ export default function OnboardingFlow({
                       if (!offerings?.current) {
                         throw new Error(t('onboarding.paywall.noOfferings'));
                       }
-                      
-                      let pkg = offerings.current.availablePackages.find(
-                        p => p.packageType === PACKAGE_TYPE.MONTHLY
-                      );
-                      
-                      if (!pkg) {
-                        pkg = offerings.current.availablePackages.find(
-                          p => p.identifier === 'monthly'
-                        );
+
+                      console.log('OnboardingFlow: Available packages:', offerings.current.availablePackages.map(p => ({
+                        identifier: p.identifier,
+                        packageType: p.packageType,
+                        productIdentifier: p.product?.identifier,
+                      })));
+
+                      let pkg: any = null;
+
+                      if (selectedPlan === 'weekly') {
+                        pkg = offerings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.WEEKLY)
+                          || offerings.current.availablePackages.find(p => p.product?.identifier === 'nnppd_weekly')
+                          || offerings.current.availablePackages.find(p => p.product?.identifier?.includes('weekly'));
+                      } else if (selectedPlan === 'monthly') {
+                        pkg = offerings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.MONTHLY)
+                          || offerings.current.availablePackages.find(p => p.product?.identifier === 'npd_mo')
+                          || offerings.current.availablePackages.find(p => p.product?.identifier?.includes('npd_mo'));
+                      } else if (selectedPlan === 'lifetime') {
+                        pkg = offerings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.LIFETIME)
+                          || offerings.current.availablePackages.find(p => p.product?.identifier === 'nnpd_lv')
+                          || offerings.current.availablePackages.find(p => p.product?.identifier?.includes('_lv'));
                       }
                       
                       if (!pkg) {
-                        throw new Error(t('onboarding.paywall.packageNotFound', { plan: 'monthly' }));
+                        console.error('OnboardingFlow: Package not found. Available:', JSON.stringify(offerings.current.availablePackages));
+                        throw new Error(t('onboarding.paywall.packageNotFound', { plan: selectedPlan }));
                       }
                       
                       const result = await Purchases.purchasePackage({ aPackage: pkg });
@@ -500,7 +535,7 @@ export default function OnboardingFlow({
                 disabled={isPurchasing}
                 className="w-80 mt-4 btn-duo disabled:opacity-50"
               >
-                {isPurchasing ? t('onboarding.paywall.processing') : 'Start My 3 Days Free Trial'}
+                {isPurchasing ? t('onboarding.paywall.processing') : `Continue with ${currentPlan.label} — ${currentPlan.price}`}
               </button>
 
               {/* Restore Purchase Button */}
@@ -519,7 +554,6 @@ export default function OnboardingFlow({
                         setTimeout(() => setAdminError(''), 3000);
                       }
                     } else {
-                      // Web fallback - no restore available on web
                       setAdminError(t('onboarding.paywall.noPurchasesFound'));
                       setTimeout(() => setAdminError(''), 3000);
                     }
@@ -542,7 +576,7 @@ export default function OnboardingFlow({
                 {!showAdminInput ? (
                   <button 
                     onClick={() => setShowAdminInput(true)}
-                    className="text-gray-400 text-xs underline"
+                    className="text-muted-foreground text-xs underline"
                   >
                     {t('onboarding.paywall.accessCode')}
                   </button>
@@ -557,7 +591,7 @@ export default function OnboardingFlow({
                           setAdminError('');
                         }}
                         placeholder={t('onboarding.paywall.enterAccessCode')}
-                        className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-center text-sm focus:outline-none focus:border-primary"
+                        className="flex-1 px-4 py-2 border border-muted rounded-lg text-center text-sm focus:outline-none focus:border-primary"
                         maxLength={20}
                       />
                       <button
@@ -566,7 +600,6 @@ export default function OnboardingFlow({
                           if (adminCode.trim().toUpperCase() === validCode) {
                             const { setSetting } = await import('@/utils/settingsStorage');
                             await setSetting('npd_admin_bypass', true);
-                            // Dispatch event so SubscriptionProvider picks up the change immediately
                             window.dispatchEvent(new CustomEvent('adminBypassActivated'));
                             onComplete();
                           } else {
@@ -580,7 +613,7 @@ export default function OnboardingFlow({
                       </button>
                     </div>
                     {adminError && (
-                      <p className="text-red-500 text-xs">{adminError}</p>
+                      <p className="text-destructive text-xs">{adminError}</p>
                     )}
                   </div>
                 )}
