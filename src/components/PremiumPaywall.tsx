@@ -4,13 +4,11 @@ import { X, Crown, Unlock, Bell, Loader2, MapPin } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
 import { Capacitor } from '@capacitor/core';
 import { triggerHaptic } from '@/utils/haptics';
-import { PRICING_DISPLAY } from '@/lib/billing';
 import { useHardwareBackButton } from '@/hooks/useHardwareBackButton';
 
 export const PremiumPaywall = () => {
   const { t } = useTranslation();
   const { showPaywall, closePaywall, unlockPro, purchase } = useSubscription();
-  const [plan, setPlan] = useState<'weekly' | 'monthly' | 'lifetime'>('weekly');
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [adminCode, setAdminCode] = useState('');
@@ -25,25 +23,21 @@ export const PremiumPaywall = () => {
 
   if (!showPaywall) return null;
 
-  const weeklyPrice = '$2.99/wk';
   const monthlyPrice = '$5.99/mo';
-  const lifetimePrice = '$10.99';
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
     setAdminError('');
     try {
       if (Capacitor.isNativePlatform()) {
-        const success = await purchase(plan);
+        const success = await purchase('monthly');
         if (success) {
           closePaywall();
         } else {
-          // purchase() returns false on cancel or failure - show feedback
           setAdminError('Purchase was cancelled or failed. Please try again.');
           setTimeout(() => setAdminError(''), 4000);
         }
       } else {
-        // Web fallback
         await unlockPro();
       }
     } catch (error: any) {
@@ -71,7 +65,6 @@ export const PremiumPaywall = () => {
           setTimeout(() => setAdminError(''), 3000);
         }
       } else {
-        // Web fallback - no restore available on web
         setAdminError('No purchases found');
         setTimeout(() => setAdminError(''), 3000);
       }
@@ -150,42 +143,14 @@ export const PremiumPaywall = () => {
            </div>
         </div>
 
-        {/* Plan selection */}
+        {/* Monthly plan only */}
         <div className="mt-10 flex flex-col items-center gap-4">
-          <div className="flex gap-2 justify-center w-full">
-            <button 
-              onClick={() => { triggerHaptic('heavy'); setPlan('weekly'); }} 
-              className={`border-2 rounded-xl p-3 flex-1 text-center relative flex flex-col items-center justify-center min-h-[70px] ${plan === 'weekly' ? 'border-[#3c78f0]' : 'border-muted'}`}
-            >
-              <p className="font-bold text-sm">{t('onboarding.paywall.weekly')}</p>
-              <p className="text-muted-foreground text-xs mt-0.5">{weeklyPrice}</p>
-            </button>
-
-            <button 
-              onClick={() => { triggerHaptic('heavy'); setPlan('monthly'); }} 
-              className={`border-2 rounded-xl p-3 flex-1 text-center relative flex flex-col items-center justify-center min-h-[70px] ${plan === 'monthly' ? 'border-[#3c78f0] bg-muted' : 'border-muted'}`}
-            >
-              <p className="font-bold text-sm">{t('onboarding.paywall.monthly')}</p>
-              <p className="text-muted-foreground text-xs mt-0.5">{monthlyPrice}</p>
-            </button>
-
-            <button 
-              onClick={() => { triggerHaptic('heavy'); setPlan('lifetime'); }} 
-              className={`border-2 rounded-xl p-3 flex-1 text-center relative flex flex-col items-center justify-center min-h-[70px] ${plan === 'lifetime' ? 'border-[#3c78f0]' : 'border-muted'}`}
-            >
-              <span className="bg-[#3c78f0] text-white text-[10px] px-2 py-0.5 rounded-full absolute left-1/2 -translate-x-1/2 -top-2.5 whitespace-nowrap font-medium">
-                {t('onboarding.paywall.bestValue')}
-              </span>
-              <p className="font-bold text-sm">{t('onboarding.paywall.lifetime')}</p>
-              <p className="text-muted-foreground text-xs mt-0.5">{lifetimePrice}</p>
-            </button>
+          <div className="flex justify-center w-full">
+            <div className="border-2 border-primary bg-secondary rounded-xl p-4 w-64 text-center">
+              <p className="font-bold text-lg">{t('onboarding.paywall.monthly')}</p>
+              <p className="text-muted-foreground text-sm mt-1">{monthlyPrice}</p>
+            </div>
           </div>
-
-          {plan === 'lifetime' && (
-            <p className="text-muted-foreground text-xs text-center max-w-xs mt-2">
-              {t('onboarding.paywall.lifetimeNote')}
-            </p>
-          )}
 
           <div className="flex flex-col items-center gap-2">
             <button 
@@ -193,11 +158,7 @@ export const PremiumPaywall = () => {
               disabled={isPurchasing}
               className="w-80 mt-4 btn-duo disabled:opacity-50"
             >
-              {isPurchasing ? t('onboarding.paywall.processing') : (
-                plan === 'weekly' ? t('onboarding.paywall.continueWithWeekly', { price: weeklyPrice }) :
-                plan === 'monthly' ? t('onboarding.paywall.continueWithMonthly', { price: monthlyPrice }) :
-                t('onboarding.paywall.getLifetime', { price: lifetimePrice })
-              )}
+              {isPurchasing ? t('onboarding.paywall.processing') : t('onboarding.paywall.continueWithMonthly', { price: monthlyPrice })}
             </button>
 
             <button 
@@ -207,6 +168,10 @@ export const PremiumPaywall = () => {
             >
               {isRestoring ? t('onboarding.paywall.restoring') : t('onboarding.paywall.restorePurchase')}
             </button>
+
+            {adminError && (
+              <p className="text-destructive text-xs mt-1">{adminError}</p>
+            )}
 
             {/* Access Code */}
             <div className="mt-6 w-full">
@@ -238,9 +203,6 @@ export const PremiumPaywall = () => {
                       {t('onboarding.paywall.apply')}
                     </button>
                   </div>
-                  {adminError && (
-                    <p className="text-destructive text-xs">{adminError}</p>
-                  )}
                 </div>
               )}
             </div>

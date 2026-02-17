@@ -22,14 +22,12 @@ const ENTITLEMENT_ID = 'npd Pro';
 
 // Product identifiers
 const PRODUCT_IDS = {
-  weekly: 'npd_wk:npd-wk-plan',
   monthly: 'npd_mo:npd-mo',
-  lifetime: 'npd_lv',
 } as const;
 
 export type ProductType = keyof typeof PRODUCT_IDS;
 export type SubscriptionTier = 'free' | 'premium';
-export type SubscriptionPlanType = 'none' | 'weekly' | 'monthly' | 'lifetime';
+export type SubscriptionPlanType = 'none' | 'monthly';
 
 // All premium features list
 export const PREMIUM_FEATURES = [
@@ -61,7 +59,7 @@ export const PREMIUM_FEATURES = [
   'customize_navigation',
 ] as const;
 
-// Features that require a recurring (weekly/monthly) subscription — NOT available on lifetime
+// Features that require a recurring (monthly) subscription
 export const RECURRING_ONLY_FEATURES: readonly PremiumFeature[] = [
   'location_reminders',
 ] as const;
@@ -261,18 +259,14 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       })));
       console.log('RevenueCat: Looking for productType:', productType, 'with ID:', PRODUCT_IDS[productType]);
 
-      let packageType;
-      if (productType === 'weekly') packageType = PACKAGE_TYPE.WEEKLY;
-      else if (productType === 'monthly') packageType = PACKAGE_TYPE.MONTHLY;
-      else packageType = PACKAGE_TYPE.LIFETIME;
+      const packageType = PACKAGE_TYPE.MONTHLY;
 
       // Try matching by package type first, then by product identifier, then by RC identifier
       const pkg = currentOfferings.current.availablePackages.find(p => p.packageType === packageType)
         || currentOfferings.current.availablePackages.find(p => p.product?.identifier === PRODUCT_IDS[productType])
         || currentOfferings.current.availablePackages.find(p => p.identifier === PRODUCT_IDS[productType])
         || currentOfferings.current.availablePackages.find(p => p.identifier === `$rc_${productType}`)
-        // Fallback: match by partial product identifier
-        || currentOfferings.current.availablePackages.find(p => p.product?.identifier?.startsWith(productType === 'lifetime' ? 'npd_lv' : productType === 'weekly' ? 'npd_wk' : 'npd_mo'));
+        || currentOfferings.current.availablePackages.find(p => p.product?.identifier?.startsWith('npd_mo'));
       
       if (!pkg) {
         console.error('RevenueCat: Package not found. Available:', JSON.stringify(currentOfferings.current.availablePackages));
@@ -430,19 +424,17 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
   // Detect plan type from RevenueCat entitlement
   const planType: SubscriptionPlanType = useMemo(() => {
     if (!isPro) return 'none';
-    // Admin bypass defaults to weekly-equivalent (full access including recurring features)
-    if (localProAccess) return 'weekly';
+    // Admin bypass defaults to monthly (full access including recurring features)
+    if (localProAccess) return 'monthly';
     if (!customerInfo) return 'none';
     const entitlement = customerInfo.entitlements.active[ENTITLEMENT_ID];
     if (!entitlement) return 'none';
     const productId = entitlement.productIdentifier || '';
-    if (productId === PRODUCT_IDS.weekly || productId.includes('wk')) return 'weekly';
-    if (productId === PRODUCT_IDS.monthly || productId.includes('month')) return 'monthly';
-    if (productId === PRODUCT_IDS.lifetime || productId.includes('lv') || productId.includes('lifetime')) return 'lifetime';
+    if (productId === PRODUCT_IDS.monthly || productId.includes('month') || productId.includes('mo')) return 'monthly';
     return 'none';
   }, [isPro, customerInfo, localProAccess]);
 
-  const isRecurringSubscriber = planType === 'weekly' || planType === 'monthly';
+  const isRecurringSubscriber = planType === 'monthly';
 
   // ==================== Feature Gating ====================
 
