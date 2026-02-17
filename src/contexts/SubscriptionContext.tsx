@@ -251,9 +251,27 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
       setRcLoading(true);
       setError(null);
       const currentOfferings = await Purchases.getOfferings();
-      if (!currentOfferings?.current) throw new Error('No offerings available');
+      if (!currentOfferings) throw new Error('No offerings available');
 
-      console.log('RevenueCat: Available packages:', currentOfferings.current.availablePackages.map(p => ({
+      // Collect ALL packages from ALL offerings (current + all named offerings)
+      const allPackages: PurchasesPackage[] = [];
+      if (currentOfferings.current) {
+        allPackages.push(...currentOfferings.current.availablePackages);
+      }
+      // Also search through all named offerings
+      if (currentOfferings.all) {
+        Object.values(currentOfferings.all).forEach((offering: any) => {
+          if (offering?.availablePackages) {
+            offering.availablePackages.forEach((p: PurchasesPackage) => {
+              if (!allPackages.find(existing => existing.identifier === p.identifier && existing.product?.identifier === p.product?.identifier)) {
+                allPackages.push(p);
+              }
+            });
+          }
+        });
+      }
+
+      console.log('RevenueCat: All available packages across offerings:', allPackages.map(p => ({
         identifier: p.identifier,
         packageType: p.packageType,
         productIdentifier: p.product?.identifier,
@@ -274,10 +292,10 @@ export const SubscriptionProvider = ({ children }: { children: ReactNode }) => {
         lifetime: 'nnpd_lv',
       };
 
-      // Try finding by package type first, then by product identifier
-      pkg = currentOfferings.current.availablePackages.find(p => p.packageType === packageTypeMap[productType])
-        || currentOfferings.current.availablePackages.find(p => p.product?.identifier === productIdMap[productType])
-        || currentOfferings.current.availablePackages.find(p => p.product?.identifier?.includes(productIdMap[productType]));
+      // Try finding by package type first, then by product identifier across ALL offerings
+      pkg = allPackages.find(p => p.packageType === packageTypeMap[productType])
+        || allPackages.find(p => p.product?.identifier === productIdMap[productType])
+        || allPackages.find(p => p.product?.identifier?.includes(productIdMap[productType]));
 
       if (pkg) {
         console.log('RevenueCat: Found package:', pkg.identifier, pkg.product?.identifier);
