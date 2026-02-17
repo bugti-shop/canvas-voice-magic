@@ -59,7 +59,7 @@ export default function OnboardingFlow({
   const [progress, setProgress] = useState(0);
   const [complete, setComplete] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'lifetime'>('monthly');
+  const [selectedPlan, setSelectedPlan] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [adminCode, setAdminCode] = useState('');
@@ -392,7 +392,7 @@ export default function OnboardingFlow({
     const PLANS = [
       { id: 'weekly' as const, label: 'Weekly', price: '$1.99/wk', badge: null },
       { id: 'monthly' as const, label: 'Monthly', price: '$5.99/mo', badge: '3 DAYS FREE' },
-      { id: 'lifetime' as const, label: 'Lifetime', price: '$29.99', badge: 'Best Value' },
+      { id: 'yearly' as const, label: 'Yearly', price: '$39.99/yr', badge: 'Best Value' },
     ];
     const currentPlan = PLANS.find(p => p.id === selectedPlan)!;
 
@@ -496,10 +496,10 @@ export default function OnboardingFlow({
                         pkg = offerings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.MONTHLY)
                           || offerings.current.availablePackages.find(p => p.product?.identifier === 'npd_mo')
                           || offerings.current.availablePackages.find(p => p.product?.identifier?.includes('npd_mo'));
-                      } else if (selectedPlan === 'lifetime') {
-                        pkg = offerings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.LIFETIME)
-                          || offerings.current.availablePackages.find(p => p.product?.identifier === 'nnpd_lv')
-                          || offerings.current.availablePackages.find(p => p.product?.identifier?.includes('_lv'));
+                      } else if (selectedPlan === 'yearly') {
+                        pkg = offerings.current.availablePackages.find(p => p.packageType === PACKAGE_TYPE.ANNUAL)
+                          || offerings.current.availablePackages.find(p => p.product?.identifier === 'npd_yr')
+                          || offerings.current.availablePackages.find(p => p.product?.identifier?.includes('npd_yr'));
                       }
                       
                       if (!pkg) {
