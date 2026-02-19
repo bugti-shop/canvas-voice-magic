@@ -78,6 +78,6 @@ export const hasAcceptedLocationDisclosure = async (): Promise<boolean> => {
   return await getSetting<boolean>('location_disclosure_accepted', false);
 };
 
-export const setLocationDisclosureAccepted = async (): Promise<void> => {
-  await setSetting('location_disclosure_accepted', true);
+export const setLocationDisclosureAccepted = async (accepted: boolean = true): Promise<void> => {
+  await setSetting('location_disclosure_accepted', accepted);
 };
