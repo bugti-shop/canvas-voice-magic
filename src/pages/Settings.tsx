@@ -415,7 +415,11 @@ const Settings = () => {
           setLocationDisclosureAcceptedState(true);
           setShowLocationDisclosure(false);
         }}
-        onDecline={() => setShowLocationDisclosure(false)}
+        onDecline={async () => {
+          await setLocationDisclosureAccepted(false);
+          setLocationDisclosureAcceptedState(false);
+          setShowLocationDisclosure(false);
+        }}
       />
 
       {/* Delete Confirmation Dialog */}

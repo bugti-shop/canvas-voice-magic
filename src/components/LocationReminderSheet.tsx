@@ -416,7 +416,8 @@ export const LocationReminderSheet = ({
           }
         }
       }}
-      onDecline={() => {
+      onDecline={async () => {
+        await setLocationDisclosureAccepted(false);
         setShowDisclosure(false);
         onClose();
       }}
