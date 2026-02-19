@@ -16,7 +16,15 @@ const PrivacyPolicy = () => {
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-8 pb-24">
         <div className="space-y-2">
           <h2 className="text-2xl font-bold">Privacy Policy</h2>
-          <p className="text-muted-foreground text-sm">Last updated: February 16, 2026</p>
+          <p className="text-muted-foreground text-sm">Last updated: February 19, 2026</p>
+          <a
+            href="https://docs.google.com/document/d/1YY5k6mXOKJtiZjEb9ws6Aq7UQbStGy-I/edit?usp=drivesdk&ouid=105643538765333343845&rtpof=true&sd=true"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block text-sm text-primary underline"
+          >
+            View hosted Privacy Policy ↗
+          </a>
         </div>
 
         <section className="space-y-3">
