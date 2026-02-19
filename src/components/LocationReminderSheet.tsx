@@ -9,6 +9,7 @@ import { useHardwareBackButton } from '@/hooks/useHardwareBackButton';
 import { MapPin, Navigation, Search, X, Bell, ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { setSetting } from '@/utils/settingsStorage';
+import { LocationDisclosureDialog, hasAcceptedLocationDisclosure, setLocationDisclosureAccepted } from '@/components/LocationDisclosureDialog';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -57,6 +58,8 @@ export const LocationReminderSheet = ({
   const [mapboxToken, setMapboxToken] = useState('');
   const [showTokenInput, setShowTokenInput] = useState(false);
   const [tokenLoaded, setTokenLoaded] = useState(false);
+  const [showDisclosure, setShowDisclosure] = useState(false);
+  const [disclosureChecked, setDisclosureChecked] = useState(false);
   
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -68,6 +71,18 @@ export const LocationReminderSheet = ({
     enabled: isOpen,
     priority: 'sheet',
   });
+
+  // Check if location disclosure has been accepted
+  useEffect(() => {
+    if (isOpen && !disclosureChecked) {
+      hasAcceptedLocationDisclosure().then((accepted) => {
+        if (!accepted) {
+          setShowDisclosure(true);
+        }
+        setDisclosureChecked(true);
+      });
+    }
+  }, [isOpen, disclosureChecked]);
 
   // Load mapbox token with default fallback
   useEffect(() => {
@@ -376,6 +391,18 @@ export const LocationReminderSheet = ({
   }, [searchQuery, mapboxToken]);
 
   return (
+    <>
+    <LocationDisclosureDialog
+      open={showDisclosure}
+      onAccept={async () => {
+        await setLocationDisclosureAccepted();
+        setShowDisclosure(false);
+      }}
+      onDecline={() => {
+        setShowDisclosure(false);
+        onClose();
+      }}
+    />
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl p-0 flex flex-col">
         <SheetHeader className="px-4 pt-4 pb-2 border-b flex-shrink-0">
@@ -570,5 +597,6 @@ export const LocationReminderSheet = ({
         )}
       </SheetContent>
     </Sheet>
+    </>
   );
 };
