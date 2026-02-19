@@ -1,4 +1,5 @@
 import { BottomNavigation } from '@/components/BottomNavigation';
+import { LocationDisclosureDialog, hasAcceptedLocationDisclosure, setLocationDisclosureAccepted } from '@/components/LocationDisclosureDialog';
 import { ChevronRight, Check, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useSubscription } from '@/contexts/SubscriptionContext';
@@ -77,10 +78,13 @@ const Settings = () => {
   
   const [hapticIntensity, setHapticIntensity] = useState<'off' | 'light' | 'medium' | 'heavy'>('medium');
   const [isRestoring, setIsRestoring] = useState(false);
+  const [showLocationDisclosure, setShowLocationDisclosure] = useState(false);
+  const [locationDisclosureAccepted, setLocationDisclosureAcceptedState] = useState(false);
 
   // Load settings from IndexedDB
   useEffect(() => {
     getSetting<'off' | 'light' | 'medium' | 'heavy'>('haptic_intensity', 'medium').then(setHapticIntensity);
+    hasAcceptedLocationDisclosure().then(setLocationDisclosureAcceptedState);
   }, []);
 
   const currentLanguage = languages.find(l => l.code === i18n.language) || languages[0];
@@ -335,6 +339,18 @@ const Settings = () => {
           <div className="border border-border rounded-lg overflow-hidden" data-tour="settings-security">
             <SectionHeading title={t('settings.security', 'Security')} />
             <SettingsRow label={<>{t('settings.appLock', 'App Lock')} {!isProSub && <Crown className="h-3.5 w-3.5 inline ml-1" style={{ color: '#3c78f0' }} />}</>} onClick={() => { if (requireFeature('app_lock')) setShowAppLockSettingsSheet(true); }} />
+            <button
+              onClick={() => setShowLocationDisclosure(true)}
+              className="w-full flex items-center justify-between px-4 py-3 border-b border-border hover:bg-muted transition-colors"
+            >
+              <div className="flex-1 text-left">
+                <span className="text-foreground text-sm block">Location Data Disclosure</span>
+                <span className="text-xs text-muted-foreground">
+                  {locationDisclosureAccepted ? '✅ Accepted' : '⚠️ Not yet accepted'}
+                </span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </button>
           </div>
 
           {/* Data Management Section */}
@@ -390,6 +406,17 @@ const Settings = () => {
       </main>
 
       <BottomNavigation />
+
+      {/* Location Disclosure Dialog */}
+      <LocationDisclosureDialog
+        open={showLocationDisclosure}
+        onAccept={async () => {
+          await setLocationDisclosureAccepted();
+          setLocationDisclosureAcceptedState(true);
+          setShowLocationDisclosure(false);
+        }}
+        onDecline={() => setShowLocationDisclosure(false)}
+      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
