@@ -392,7 +392,7 @@ const Settings = () => {
             <SettingsRow label={t('settings.shareWithFriends')} onClick={handleShareApp} />
             <SettingsRow label={t('settings.termsOfService')} onClick={() => setShowTermsDialog(true)} />
             <SettingsRow label={t('settings.helpFeedback')} onClick={() => setShowHelpDialog(true)} />
-            <SettingsRow label={t('settings.privacy')} onClick={() => setShowPrivacyDialog(true)} />
+            <SettingsRow label={t('settings.privacy')} onClick={() => window.open('https://docs.google.com/document/d/1YY5k6mXOKJtiZjEb9ws6Aq7UQbStGy-I/edit?usp=drivesdk&ouid=105643538765333343845&rtpof=true&sd=true', '_blank')} />
             <SettingsRow label={t('settings.rateApp')} onClick={handleRateAndShare} />
             <SettingsRow label={t('settings.whatsNew', "What's New")} onClick={() => window.dispatchEvent(new CustomEvent('showWhatsNew'))} />
             <div className="border-b-0">
