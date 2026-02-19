@@ -55,7 +55,7 @@ export const LocationDisclosureDialog = ({
               </p>
               <p className="text-xs">
                 By tapping "Allow", you consent to background location access for this feature. See our{' '}
-                <a href="/privacy-policy" className="text-primary underline">Privacy Policy</a> for more details.
+                <a href="https://docs.google.com/document/d/1YY5k6mXOKJtiZjEb9ws6Aq7UQbStGy-I/edit?usp=drivesdk&ouid=105643538765333343845&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" className="text-primary underline">Privacy Policy</a> for more details.
               </p>
             </div>
           </AlertDialogDescription>

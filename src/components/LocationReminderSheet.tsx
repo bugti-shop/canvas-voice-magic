@@ -397,6 +397,14 @@ export const LocationReminderSheet = ({
       onAccept={async () => {
         await setLocationDisclosureAccepted();
         setShowDisclosure(false);
+        // Trigger native location permission prompt
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            () => { /* Permission granted */ },
+            (err) => console.log('Location permission denied or error:', err),
+            { enableHighAccuracy: true }
+          );
+        }
       }}
       onDecline={() => {
         setShowDisclosure(false);
