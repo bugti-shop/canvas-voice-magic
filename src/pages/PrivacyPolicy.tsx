@@ -45,10 +45,21 @@ const PrivacyPolicy = () => {
             <li>Device information (device type, operating system, unique device identifiers)</li>
             <li>Usage data (features used, interaction patterns, crash reports)</li>
             <li>Log data (access times, pages viewed, app performance data)</li>
-            <li>Location data (only when you explicitly enable location-based reminders)</li>
           </ul>
 
-          <h4 className="font-medium mt-4">2.3 Information from Third Parties</h4>
+          <h4 className="font-medium mt-4">2.3 Location Data</h4>
+          <p className="text-muted-foreground leading-relaxed">
+            When you enable the <strong>Location-Based Reminders</strong> feature, our app accesses your device's location data, including <strong>background location (ACCESS_BACKGROUND_LOCATION)</strong>. This is used solely to monitor your proximity to locations you have set for task reminders, so the app can notify you when you arrive at or leave those locations — even when the app is running in the background or is closed.
+          </p>
+          <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
+            <li><strong>What we access:</strong> Your device's precise GPS location (foreground and background)</li>
+            <li><strong>Why we access it:</strong> To trigger location-based task reminders when you enter or exit a geofence area you configured</li>
+            <li><strong>How it is processed:</strong> All location data is processed entirely on your device. We do <strong>not</strong> transmit, collect, or store your location data on any external server</li>
+            <li><strong>Third-party sharing:</strong> Your location data is <strong>never</strong> shared with third parties, advertisers, or analytics services</li>
+            <li><strong>User control:</strong> You can disable location reminders at any time from the task settings, which immediately stops all location access. You can also revoke location permissions from your device's system settings</li>
+          </ul>
+
+          <h4 className="font-medium mt-4">2.4 Information from Third Parties</h4>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
             <li>Google account information if you use Google Sign-In</li>
             <li>Google Drive data if you enable cloud sync</li>
@@ -63,6 +74,7 @@ const PrivacyPolicy = () => {
             <li>To personalize your experience and deliver relevant content</li>
             <li>To process transactions and manage subscriptions</li>
             <li>To send notifications, reminders, and alerts you've configured</li>
+            <li><strong>To provide location-based reminders:</strong> We use your location data (including background location) solely to determine when you enter or leave a geofenced area you configured, triggering task reminders on your device</li>
             <li>To sync your data across devices when you enable cloud sync</li>
             <li>To provide customer support and respond to your requests</li>
             <li>To monitor usage patterns and improve app performance</li>
@@ -154,7 +166,7 @@ const PrivacyPolicy = () => {
             If you have any questions or concerns about this Privacy Policy or our data practices, please contact us at:
           </p>
           <p className="text-muted-foreground">
-            Email: support@notepad.app
+            Email: bugtishop@gmail.com
           </p>
         </section>
       </main>
