@@ -397,13 +397,23 @@ export const LocationReminderSheet = ({
       onAccept={async () => {
         await setLocationDisclosureAccepted();
         setShowDisclosure(false);
-        // Trigger native location permission prompt
-        if ('geolocation' in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            () => { /* Permission granted */ },
-            (err) => console.log('Location permission denied or error:', err),
-            { enableHighAccuracy: true }
-          );
+        // Request native location permission via Capacitor (falls back to browser)
+        try {
+          const { Geolocation } = await import('@capacitor/geolocation');
+          const status = await Geolocation.requestPermissions();
+          console.log('Location permission status:', status);
+          if (status.location === 'denied') {
+            console.log('Location permission denied by user');
+          }
+        } catch (err) {
+          // Fallback to browser geolocation prompt
+          if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+              () => {},
+              (e) => console.log('Browser location permission error:', e),
+              { enableHighAccuracy: true }
+            );
+          }
         }
       }}
       onDecline={() => {
