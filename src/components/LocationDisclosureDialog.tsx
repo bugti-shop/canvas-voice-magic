@@ -38,17 +38,18 @@ export const LocationDisclosureDialog = ({
           <AlertDialogDescription asChild>
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                <strong className="text-foreground">Npd collects and accesses your device's precise location data, including in the background,</strong> to provide location-based task reminders. This means the app will access your GPS location even when the app is closed or not in use.
+                <strong className="text-foreground">Npd collects your device's precise location data, including in the background,</strong> to power location-based task reminders.
               </p>
               <div className="bg-muted/50 rounded-lg p-3 space-y-2">
                 <p className="font-medium text-foreground flex items-center gap-2">
-                  <Shield className="h-4 w-4" /> What location data is accessed and how it is used:
+                  <Shield className="h-4 w-4" /> Location data: what, why, and how
                 </p>
-                <ul className="list-disc list-inside space-y-1 ml-1">
-                  <li><strong className="text-foreground">Data accessed:</strong> Your device's precise GPS location (foreground and background)</li>
-                  <li><strong className="text-foreground">Purpose:</strong> To notify you when you arrive at or leave a location you set for a task reminder</li>
-                  <li><strong className="text-foreground">Processing:</strong> All location data is processed <strong className="text-foreground">only on your device</strong> and is not transmitted to any server</li>
-                  <li><strong className="text-foreground">Sharing:</strong> We do <strong className="text-foreground">not</strong> collect, store, or share your location data with any third parties, advertisers, or analytics services</li>
+                <ul className="list-disc list-inside space-y-1.5 ml-1">
+                  <li><strong className="text-foreground">What we collect:</strong> Your device's precise GPS location (foreground and background)</li>
+                  <li><strong className="text-foreground">Why we collect it:</strong> To detect when you arrive at or leave a place you've linked to a task reminder</li>
+                  <li><strong className="text-foreground">How we use it:</strong> Your location is compared on-device against the geofence areas you set for your tasks. When you enter or leave one of those areas, the app sends you a local notification. That is the <strong className="text-foreground">only</strong> use of your location data</li>
+                  <li><strong className="text-foreground">Storage:</strong> Location data is processed in real-time on your device and is <strong className="text-foreground">not stored, logged, or saved</strong> anywhere</li>
+                  <li><strong className="text-foreground">Sharing:</strong> Your location data is <strong className="text-foreground">never</strong> sent to any server, third party, advertiser, or analytics service</li>
                 </ul>
               </div>
               <p>
