@@ -139,15 +139,6 @@ export const PremiumPaywall = () => {
                <p className="text-muted-foreground text-sm">{t('onboarding.paywall.proMemberDesc')}</p>
              </div>
            </div>
-           <div className="flex items-start gap-3 relative">
-             <div className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white z-10 flex-shrink-0">
-               <MapPin size={16} strokeWidth={2} />
-             </div>
-             <div>
-               <p className="font-semibold">{t('onboarding.paywall.locationReminders')}</p>
-               <p className="text-muted-foreground text-sm">{t('onboarding.paywall.locationRemindersDesc')}</p>
-             </div>
-           </div>
         </div>
 
         {/* Plan selection */}
