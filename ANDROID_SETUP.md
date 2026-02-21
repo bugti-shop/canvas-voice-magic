@@ -33,12 +33,9 @@ This guide provides complete Android native code including:
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     
-    <!-- Location (for location-based reminders) -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    
+    <!-- Foreground Service (for notifications) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     
     <!-- Microphone (for voice notes/recording) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -107,12 +104,6 @@ This guide provides complete Android native code including:
         </receiver>
         
         
-        <!-- ==================== LOCATION SERVICE ==================== -->
-        
-        <service
-            android:name="com.transistorsoft.locationmanager.service.LocationService"
-            android:foregroundServiceType="location"
-            android:exported="false" />
             
     </application>
 

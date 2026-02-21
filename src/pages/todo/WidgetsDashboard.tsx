@@ -80,7 +80,7 @@ const WidgetsDashboard = () => {
     const lowPriority = items.filter(t => !t.completed && t.priority === 'low').length;
     
     const recurring = items.filter(t => t.repeatType && t.repeatType !== 'none').length;
-    const withLocation = items.filter(t => t.locationReminder?.enabled).length;
+    const withLocation = 0;
     const withReminders = items.filter(t => t.reminderTime).length;
     const withSubtasks = items.filter(t => t.subtasks && t.subtasks.length > 0).length;
 

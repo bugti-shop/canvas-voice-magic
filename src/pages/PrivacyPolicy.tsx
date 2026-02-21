@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-8 pb-24">
         <div className="space-y-2">
           <h2 className="text-2xl font-bold">Privacy Policy</h2>
-          <p className="text-muted-foreground text-sm">Last updated: February 19, 2026</p>
+          <p className="text-muted-foreground text-sm">Last updated: February 21, 2026</p>
           <a
             href="https://docs.google.com/document/d/1YY5k6mXOKJtiZjEb9ws6Aq7UQbStGy-I/edit?usp=drivesdk&ouid=105643538765333343845&rtpof=true&sd=true"
             target="_blank"
@@ -30,7 +30,7 @@ const PrivacyPolicy = () => {
         <section className="space-y-3">
           <h3 className="text-lg font-semibold">1. Introduction</h3>
           <p className="text-muted-foreground leading-relaxed">
-            Welcome to NotePad ("we," "our," or "us"). We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and related services (collectively, the "Service").
+            Welcome to Npd ("we," "our," or "us"). We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application and related services (collectively, the "Service").
           </p>
           <p className="text-muted-foreground leading-relaxed">
             By using the Service, you agree to the collection and use of information in accordance with this policy. If you do not agree with the terms of this Privacy Policy, please do not access or use the Service.
@@ -55,19 +55,7 @@ const PrivacyPolicy = () => {
             <li>Log data (access times, pages viewed, app performance data)</li>
           </ul>
 
-          <h4 className="font-medium mt-4">2.3 Location Data</h4>
-          <p className="text-muted-foreground leading-relaxed">
-            When you enable the <strong>Location-Based Reminders</strong> feature, our app accesses your device's location data, including <strong>background location (ACCESS_BACKGROUND_LOCATION)</strong>. This is used solely to monitor your proximity to locations you have set for task reminders, so the app can notify you when you arrive at or leave those locations — even when the app is running in the background or is closed.
-          </p>
-          <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
-            <li><strong>What we access:</strong> Your device's precise GPS location (foreground and background)</li>
-            <li><strong>Why we access it:</strong> To trigger location-based task reminders when you enter or exit a geofence area you configured</li>
-            <li><strong>How it is processed:</strong> All location data is processed entirely on your device. We do <strong>not</strong> transmit, collect, or store your location data on any external server</li>
-            <li><strong>Third-party sharing:</strong> Your location data is <strong>never</strong> shared with third parties, advertisers, or analytics services</li>
-            <li><strong>User control:</strong> You can disable location reminders at any time from the task settings, which immediately stops all location access. You can also revoke location permissions from your device's system settings</li>
-          </ul>
-
-          <h4 className="font-medium mt-4">2.4 Information from Third Parties</h4>
+          <h4 className="font-medium mt-4">2.3 Information from Third Parties</h4>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
             <li>Google account information if you use Google Sign-In</li>
             <li>Google Drive data if you enable cloud sync</li>
@@ -82,7 +70,6 @@ const PrivacyPolicy = () => {
             <li>To personalize your experience and deliver relevant content</li>
             <li>To process transactions and manage subscriptions</li>
             <li>To send notifications, reminders, and alerts you've configured</li>
-            <li><strong>To provide location-based reminders:</strong> We use your location data (including background location) solely to determine when you enter or leave a geofenced area you configured, triggering task reminders on your device</li>
             <li>To sync your data across devices when you enable cloud sync</li>
             <li>To provide customer support and respond to your requests</li>
             <li>To monitor usage patterns and improve app performance</li>
@@ -105,7 +92,7 @@ const PrivacyPolicy = () => {
           <h3 className="text-lg font-semibold">5. Data Sharing and Disclosure</h3>
           <p className="text-muted-foreground leading-relaxed">We do not sell your personal information. We may share your information in the following circumstances:</p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
-            <li><strong>Service Providers:</strong> Third-party services that help us operate the app (e.g., cloud storage, analytics, payment processing)</li>
+            <li><strong>Service Providers:</strong> Third-party services that help us operate the app (e.g., cloud storage, payment processing)</li>
             <li><strong>Legal Requirements:</strong> When required by law, subpoena, or government request</li>
             <li><strong>Safety:</strong> To protect the rights, property, or safety of our users or the public</li>
             <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
@@ -120,8 +107,6 @@ const PrivacyPolicy = () => {
             <li><strong>Google Drive:</strong> For cloud synchronization of your data</li>
             <li><strong>Google Sign-In:</strong> For authentication</li>
             <li><strong>RevenueCat:</strong> For subscription and payment management</li>
-            <li><strong>Mapbox:</strong> For location-based reminder features</li>
-            
           </ul>
           <p className="text-muted-foreground leading-relaxed">
             Each third-party service has its own privacy policy governing the use of your information. We encourage you to review their respective privacy policies.
@@ -135,7 +120,7 @@ const PrivacyPolicy = () => {
             <li><strong>Correction:</strong> You can update or correct your information through the app settings</li>
             <li><strong>Deletion:</strong> You can delete your account and associated data by contacting us</li>
             <li><strong>Export:</strong> You can export your notes and tasks in various formats (PDF, DOCX, Markdown)</li>
-            <li><strong>Opt-Out:</strong> You can disable notifications, location services, and cloud sync at any time</li>
+            <li><strong>Opt-Out:</strong> You can disable notifications and cloud sync at any time</li>
             <li><strong>Data Portability:</strong> You can request a copy of your data in a machine-readable format</li>
           </ul>
         </section>

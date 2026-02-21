@@ -40,10 +40,10 @@ import {
   Crown
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
-import { LocationReminderSheet } from './LocationReminderSheet';
+
 import { escalationTimingLabel } from '@/utils/deadlineEscalation';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { LocationMapPreview } from './LocationMapPreview';
+
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -119,7 +119,7 @@ export const TaskDetailPage = ({
   // Subtask detail sheet state
   const [selectedSubtask, setSelectedSubtask] = useState<TodoItem | null>(null);
   const [showSubtaskDetailSheet, setShowSubtaskDetailSheet] = useState(false);
-  const [showLocationReminder, setShowLocationReminder] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewAttachment, setPreviewAttachment] = useState<{ url: string; name: string; type: string } | null>(null);
 
@@ -597,24 +597,6 @@ export const TaskDetailPage = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
-  // Location reminder handlers
-  const handleSaveLocationReminder = (reminder: LocationReminder) => {
-    if (!task) return;
-    onUpdate({
-      ...task,
-      locationReminder: reminder,
-    });
-    toast.success(t('taskDetailToasts.locationReminderSet'));
-  };
-
-  const handleRemoveLocationReminder = () => {
-    if (!task) return;
-    onUpdate({
-      ...task,
-      locationReminder: undefined,
-    });
-    toast.success(t('taskDetailToasts.locationReminderRemoved'));
-  };
 
   return (
     <div 
@@ -836,14 +818,6 @@ export const TaskDetailPage = ({
           </div>
         )}
 
-        {/* Location Map Display */}
-        {task.location && (
-          <LocationMapPreview 
-            location={task.location} 
-            showFullMap={true}
-            onClose={() => onUpdate({ ...task, location: undefined })}
-          />
-        )}
 
         {/* Subtasks - Bullet Point Structure */}
         <div className="space-y-3">
@@ -1119,13 +1093,6 @@ export const TaskDetailPage = ({
           </div>
         )}
 
-        {/* Location Reminder Preview */}
-        {task.locationReminder?.enabled && task.locationReminder.address && (
-          <LocationMapPreview 
-            location={task.locationReminder.address} 
-            onClose={handleRemoveLocationReminder}
-          />
-        )}
 
         {/* File Attachments Section */}
         <div className="bg-muted/30 rounded-xl p-4">
@@ -1215,21 +1182,6 @@ export const TaskDetailPage = ({
             <span className="flex-1 text-left">{t('taskDetail.convertToNotes')}</span>
           </button>
 
-          {/* Location Reminder - Weekly/Monthly Only */}
-          <button 
-            onClick={() => { if (!requireFeature('location_reminders')) return; setShowLocationReminder(true); }}
-            className={cn(
-              "w-full flex items-center gap-3 py-3 hover:bg-muted/50 rounded-lg px-2 transition-colors",
-              task.locationReminder?.enabled && "bg-accent-pink/10"
-            )}
-          >
-            <MapPin className={cn("h-5 w-5", task.locationReminder?.enabled ? "text-accent-pink" : "text-muted-foreground")} />
-            <span className="flex-1 text-left">{t('taskDetail.locationReminder')}</span>
-            {!isRecurringSubscriber && <Crown className="h-3.5 w-3.5 mr-1" style={{ color: '#3c78f0' }} />}
-            {task.locationReminder?.enabled && (
-              <span className="text-xs text-accent-pink">{task.locationReminder.address?.split(',')[0]}</span>
-            )}
-          </button>
 
 
           <div className="space-y-2">
@@ -1414,14 +1366,6 @@ export const TaskDetailPage = ({
         onConvertToTask={handleConvertSubtaskToTask}
       />
 
-      {/* Location Reminder Sheet */}
-      <LocationReminderSheet
-        isOpen={showLocationReminder}
-        onClose={() => setShowLocationReminder(false)}
-        locationReminder={task.locationReminder}
-        onSave={handleSaveLocationReminder}
-        onRemove={handleRemoveLocationReminder}
-      />
 
       {/* In-App Attachment Preview */}
       {previewAttachment && (

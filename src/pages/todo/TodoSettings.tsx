@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LocationDisclosureDialog, hasAcceptedLocationDisclosure, setLocationDisclosureAccepted } from '@/components/LocationDisclosureDialog';
+
 import { TodoBottomNavigation } from '@/components/TodoBottomNavigation';
 import { ChevronRight, Check, ChevronDown, Crown } from 'lucide-react';
 import { useSubscription } from '@/contexts/SubscriptionContext';
@@ -68,8 +68,6 @@ const TodoSettings = () => {
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
-  const [showLocationDisclosure, setShowLocationDisclosure] = useState(false);
-  const [locationDisclosureAccepted, setLocationDisclosureAcceptedState] = useState(false);
   // Notification settings
   const [taskRemindersEnabled, setTaskRemindersEnabled] = useState(true);
   const [noteRemindersEnabled, setNoteRemindersEnabled] = useState(true);
@@ -85,7 +83,7 @@ const TodoSettings = () => {
     getSetting<boolean>('dailyDigestEnabled', false).then(setDailyDigestEnabled);
     getSetting<boolean>('overdueAlertsEnabled', true).then(setOverdueAlertsEnabled);
     getSetting<boolean>('systemCalendarSyncEnabled', false).then(setCalendarSyncEnabled);
-    hasAcceptedLocationDisclosure().then(setLocationDisclosureAcceptedState);
+    
   }, []);
 
   const handleLanguageChange = async (langCode: string) => {
@@ -370,18 +368,6 @@ const TodoSettings = () => {
               label={<>{t('settings.appLock', 'App Lock')} {!isPro && <Crown className="h-3.5 w-3.5 inline ml-1" style={{ color: '#3c78f0' }} />}</>}
               onClick={() => { if (requireFeature('app_lock')) setShowAppLockSettingsSheet(true); }} 
             />
-            <button
-              onClick={() => setShowLocationDisclosure(true)}
-              className="w-full flex items-center justify-between px-4 py-3 border-b border-border hover:bg-muted transition-colors"
-            >
-              <div className="flex-1 text-left">
-                <span className="text-foreground text-sm block">Location Data Disclosure</span>
-                <span className="text-xs text-muted-foreground">
-                  {locationDisclosureAccepted ? '✅ Accepted' : '⚠️ Not yet accepted'}
-                </span>
-              </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            </button>
           </div>
 
           {/* Data Management Section */}
@@ -688,20 +674,6 @@ const TodoSettings = () => {
         filePath={backupFilePath}
       />
 
-      {/* Location Disclosure Dialog */}
-      <LocationDisclosureDialog
-        open={showLocationDisclosure}
-        onAccept={async () => {
-          await setLocationDisclosureAccepted();
-          setLocationDisclosureAcceptedState(true);
-          setShowLocationDisclosure(false);
-        }}
-        onDecline={async () => {
-          await setLocationDisclosureAccepted(false);
-          setLocationDisclosureAcceptedState(false);
-          setShowLocationDisclosure(false);
-        }}
-      />
 
       <TodoBottomNavigation />
     </div>

@@ -47,7 +47,7 @@ import { EditActionsSheet, ActionItem, defaultActions } from './EditActionsSheet
 import { WaveformVisualizer } from './WaveformVisualizer';
 import { VoiceTrimmer } from './VoiceTrimmer';
 import { WaveformProgressBar } from './WaveformProgressBar';
-import { LocationSearchInput } from './LocationSearchInput';
+
 import { TaskTemplateSheet, TaskTemplate } from './TaskTemplateSheet';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -123,7 +123,7 @@ export const TaskInputSheet = ({ isOpen, onClose, onAddTask, folders, selectedFo
   const [deadlineReminderTime, setDeadlineReminderTime] = useState<Date | undefined>();
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
-  const [locationReminder, setLocationReminder] = useState<LocationReminder | undefined>();
+
   const [showDescriptionInput, setShowDescriptionInput] = useState(false);
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [showEditActions, setShowEditActions] = useState(false);
@@ -217,9 +217,7 @@ export const TaskInputSheet = ({ isOpen, onClose, onAddTask, folders, selectedFo
       setDeadlineReminderTime(undefined);
       setDescription('');
       setLocation('');
-      setLocationReminder(undefined);
       setShowDescriptionInput(false);
-      setShowLocationInput(false);
       setAttachments([]);
       setVoiceRecording(undefined);
       setIsRecording(false);
@@ -346,7 +344,6 @@ export const TaskInputSheet = ({ isOpen, onClose, onAddTask, folders, selectedFo
       voiceRecording,
       description: finalDescription || undefined,
       location: finalLocation,
-      locationReminder: locationReminder,
       subtasks: subtasks,
       attachments: attachments.length > 0 ? attachments : undefined,
       estimatedHours: finalEstimatedHours,
@@ -376,9 +373,7 @@ export const TaskInputSheet = ({ isOpen, onClose, onAddTask, folders, selectedFo
       setDeadlineReminderTime(undefined);
       setDescription('');
       setLocation('');
-      setLocationReminder(undefined);
       setShowDescriptionInput(false);
-      setShowLocationInput(false);
       setAttachments([]);
       setEstimatedHours(undefined);
       setVoiceRecording(undefined);
@@ -1131,23 +1126,6 @@ export const TaskInputSheet = ({ isOpen, onClose, onAddTask, folders, selectedFo
             </div>
           )}
 
-          {/* Location indicator */}
-          {location && (
-            <div className="px-4 py-2 bg-pink-50 dark:bg-pink-950/20 rounded-lg flex items-center gap-2 mb-4">
-              <MapPin className="h-4 w-4 text-pink-500" />
-              <span className="text-sm text-pink-700 dark:text-pink-300 font-medium truncate flex-1">
-                {location}
-              </span>
-              <button
-                onClick={() => {
-                  setLocation('');
-                }}
-                className="ml-auto"
-              >
-                <X className="h-4 w-4 text-pink-500 hover:text-pink-700" />
-              </button>
-            </div>
-          )}
 
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {/* Template button - always first */}
@@ -1542,54 +1520,7 @@ export const TaskInputSheet = ({ isOpen, onClose, onAddTask, folders, selectedFo
               }
 
               if (action.id === 'location') {
-                return (
-                  <Popover key={action.id} open={showLocationInput} onOpenChange={setShowLocationInput}>
-                    <PopoverTrigger asChild>
-                      <button
-                        onClick={(e) => {
-                          if (!requireFeature('location_reminders')) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            return;
-                          }
-                        }}
-                        className={cn(
-                          "relative flex items-center gap-1.5 px-3 py-2 rounded-md border transition-all whitespace-nowrap",
-                          locationReminder?.enabled ? "border-pink-500 bg-pink-50 dark:bg-pink-950/30" : 
-                          location ? "border-pink-500 bg-pink-50 dark:bg-pink-950/30" : "border-border bg-card hover:bg-muted"
-                        )}
-                      >
-                        {(location || locationReminder?.enabled) && <span className="absolute -top-1 -right-1 w-2 h-2 bg-pink-500 rounded-full" />}
-                        <MapPin className={cn("h-4 w-4 flex-shrink-0", (location || locationReminder?.enabled) ? "text-pink-500" : "text-muted-foreground")} />
-                        <span className={cn("text-sm whitespace-nowrap", (location || locationReminder?.enabled) ? "text-pink-600 dark:text-pink-400" : "text-muted-foreground")}>
-                          {locationReminder?.enabled ? t('taskInput.locationReminder') : location ? t('taskInput.hasLocation') : t('taskInput.location')}
-                        </span>
-                        {!isRecurringSubscriber && <Crown className="h-3 w-3 text-amber-500 flex-shrink-0" />}
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80 p-3 bg-popover z-[100]" align="start">
-                      <div className="space-y-3">
-                        <p className="text-sm font-medium">{t('taskInput.locationReminder')}</p>
-                        <LocationSearchInput
-                          value={location}
-                          onChange={setLocation}
-                          onLocationSelect={(reminder) => {
-                            setLocation(reminder.address);
-                            setLocationReminder(reminder);
-                          }}
-                          locationReminder={locationReminder}
-                          onClear={() => {
-                            setLocation('');
-                            setLocationReminder(undefined);
-                          }}
-                        />
-                        <Button size="sm" className="w-full" onClick={() => setShowLocationInput(false)}>
-                          {t('common.done')}
-                        </Button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                );
+                return null;
               }
 
               // Repeat section removed - now handled in TaskDateTimePage
